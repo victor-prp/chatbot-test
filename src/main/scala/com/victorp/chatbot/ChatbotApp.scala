@@ -19,7 +19,7 @@ object ChatbotApp extends App{
   val set = Set()
 
   // Create an Akka system
-  val system = ActorSystem("MergeSortSystem")
+  val system = ActorSystem("ChatbotSystem")
 
   // create actors
   val router = system.actorOf(Props[Router])
