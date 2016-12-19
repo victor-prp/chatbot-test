@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.GregorianCalendar
 
 import akka.actor.{Props, ActorSystem}
+import com.victorp.chatbot.actor.Router
 import com.victorp.chatbot.dto.ChatMessage
 import akka.actor._
 

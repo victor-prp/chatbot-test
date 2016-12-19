@@ -6,3 +6,4 @@ package com.victorp.chatbot.dto
 case class ChatMessage(userId:String,text:String) {}
 
 
+

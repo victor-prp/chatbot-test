@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <configuration>
-    <!--<appender name="defaultLog" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-        <!--&lt;!&ndash;See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender&ndash;&gt;-->
-        <!--<File>sarit_test.log</File>-->
-        <!--<encoder>-->
-            <!--<pattern>%d{dd MMM yyyy HH:mm:ss.SSS} [%t] %-5p %x %F:%L - %m</pattern>-->
-        <!--</encoder>-->
-        <!--<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy"/>-->
-        <!--<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">-->
-            <!--<MaxFileSize>50000KB</MaxFileSize>-->
-        <!--</triggeringPolicy>-->
-    <!--</appender>-->
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
