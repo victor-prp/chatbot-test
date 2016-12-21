@@ -1,6 +1,6 @@
 package com.victorp.chatbot.actor
 
-import akka.actor.Actor.Receive
+import akka.pattern.ask
 import akka.actor.{Props, ActorRef}
 import com.victorp.chatbot.dto.ChatMessage
 
@@ -12,17 +12,17 @@ class Router extends BaseActor {
 
   var chatManagers: Map[String, ActorRef] = Map()
 
-  def createChatManager(userId: String): ActorRef = {
-    val cm = context.actorOf(Props(classOf[ChatManager], userId), name = s"ChatManager-$userId")
+  def createChatbot(userId: String): ActorRef = {
+    val cm = context.actorOf(Props(classOf[Chatbot], userId), name = s"ChatManager-$userId")
     chatManagers += (userId -> cm)
     cm
   }
 
 
-  def chatManagerActor(userId: String): ActorRef = {
+  def chatbotActor(userId: String): ActorRef = {
     chatManagers.get(userId) match {
       case Some(cm) => cm
-      case None => createChatManager(userId)
+      case None => createChatbot(userId)
     }
   }
 
@@ -30,7 +30,7 @@ class Router extends BaseActor {
   override def receive: Receive = {
     case chatMsg: ChatMessage => {
       log.debug(s"Router received msg: {}", chatMsg)
-      val chatManager = chatManagerActor(chatMsg.userId)
+      val chatManager = chatbotActor(chatMsg.userId)
       chatManager ! chatMsg
     }
   }

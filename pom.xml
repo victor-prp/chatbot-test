@@ -11,13 +11,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.11.7</scala.version>
-        <akka.version>2.4.2</akka.version>
+        <scala.version>2.11.8</scala.version>
+        <akka.version>2.4.14</akka.version>
+        <akka-http.version>10.0.0</akka-http.version>
+
         <logback.version>1.1.8</logback.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-compiler -->
+        <!-- scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-compiler</artifactId>
@@ -30,14 +32,52 @@
             <version>${scala.version}</version>
         </dependency>
 
+        <!--akka core-->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
             <version>${akka.version}</version>
         </dependency>
 
+        <!-- akka-http  -->
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-http-core_2.11</artifactId>-->
+            <!--<version>10.0.0</version>-->
+        <!--</dependency>-->
 
-        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-http_2.11</artifactId>
+            <version>${akka-http.version}</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-http-testkit_2.11</artifactId>-->
+            <!--<version>10.0.0</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-http-spray-json_2.11</artifactId>-->
+            <!--<version>10.0.0</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-http-jackson_2.11</artifactId>-->
+            <!--<version>10.0.0</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-http-xml_2.11</artifactId>-->
+            <!--<version>10.0.0</version>-->
+        <!--</dependency>-->
+
+
+        <!-- logging -->
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>
