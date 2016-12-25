@@ -1,30 +1,31 @@
 package com.victorp.chatbot
 
-import java.text.SimpleDateFormat
-import java.util.GregorianCalendar
 
-import akka.actor.{Props, ActorSystem}
-import com.victorp.chatbot.actor.Router
-import com.victorp.chatbot.dto.ChatMessage
 import akka.actor._
+import com.typesafe.config.ConfigFactory
+import com.victorp.chatbot.dto.FBUserTextMessage
+import akka.http.scaladsl.Http
+import akka.stream.ActorMaterializer
+import com.victorp.chatbot.rest.Resources
 
 /**
  * @author victorp
  */
 object ChatbotApp extends App{
 
-
   System.out.println("Hello From Chatbot")
 
+  AppContext.fbConnector ! FBUserTextMessage("user-1","Hello Bot!")
 
-  val set = Set()
+  implicit val system = AppContext.system
+  implicit val materializer = ActorMaterializer()
+  // needed for the future flatMap/onComplete in the end
+  //implicit val executionContext = system.dispatcher
 
-  // Create an Akka system
-  val system = ActorSystem("ChatbotSystem")
+  val config = ConfigFactory.load()
 
-  // create actors
-  val router = system.actorOf(Props[Router])
 
-  router ! ChatMessage("user-1","Hello Bot!")
+
+  val bindingFuture = Http().bindAndHandle(Resources.routes, "localhost", 10000)
 
 }

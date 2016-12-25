@@ -1,11 +1,13 @@
 package com.victorp.chatbot.actor
 
+import akka.actor.ActorRef
 import akka.util.ByteString
-import com.victorp.chatbot.dto.ChatMessage
+import com.victorp.chatbot.AppContext
+import com.victorp.chatbot.dto.FBUserTextMessage
 import com.victorp.chatbot.model.{ChatMsg, Chat}
 import com.victorp.chatbot.util.IdUtil
 import com.victorp.chatbot.util.IdUtil._
-import com.victorp.chatbot.util.ModelUtil.convert
+import com.victorp.chatbot.util.ModelUtil.convertUserMsg
 import com.victorp.chatbot.util.TimeUtil._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
@@ -26,30 +28,28 @@ class Chatbot(val consumerId:String) extends BaseActor{
 
   var chat:Chat = Chat()
 
-  def echo(msg: ChatMessage): ChatMsg = {
-    ChatMsg(nextMsgId(),now(),s"Got your message: ${msg.text}" ,IdUtil.botId)
+  def echo(userMsg: ChatMsg): ChatMsg = {
+    ChatMsg(nextMsgId(),now(),s"Got your message: ${userMsg.text}" ,IdUtil.botId,userMsg.sourceId,userMsg.platform)
   }
 
   override def receive: Receive = {
-    case chatMsg: ChatMessage => {
+    case chatMsg: ChatMsg => {
       log.debug(s"ChatManager received msg: {}", chatMsg)
-      chat = chat + convert(chatMsg)
-      val botMsg = echo(chatMsg)
-      chat = chat + botMsg
+      chat = chat + chatMsg
 
-      http.singleRequest(HttpRequest(uri = "http://akka.io"))
-        .pipeTo(self)
+      val botMsg = echo(chatMsg)
+      AppContext.fbConnector ! botMsg //TODO patch: use pub/sub instead of direct messaging
     }
 
 
-    /**
-     * The response is receive as a message to the actor since we called pipeTo(self)
-     */
-      case HttpResponse(StatusCodes.OK, headers, entity, _) =>
-        log.info("Got response, headers: {}" ,headers)
-
-      case HttpResponse(code, _, _, _) =>
-        log.info("Request failed, response code: {}",code)
+//    /**
+//     * The response is receive as a message to the actor since we called pipeTo(self)
+//     */
+//      case HttpResponse(StatusCodes.OK, headers, entity, _) =>
+//        log.info("Got response, headers: {}" ,headers)
+//
+//      case HttpResponse(code, _, _, _) =>
+//        log.info("Request failed, response code: {}",code)
     }
 
 
