@@ -3,7 +3,6 @@ package com.victorp.chatbot.rest
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
 import com.victorp.chatbot.AppContext
 import com.victorp.chatbot.dto.FBUserTextMessage
 import com.victorp.chatbot.protocol.FBProtocol
