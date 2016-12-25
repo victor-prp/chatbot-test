@@ -1,6 +1,8 @@
 package com.victorp.chatbot
 
 
+import java.net.URL
+
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 import com.victorp.chatbot.dto.FBUserTextMessage
@@ -15,17 +17,16 @@ object ChatbotApp extends App{
 
   System.out.println("Hello From Chatbot")
 
-  AppContext.fbConnector ! FBUserTextMessage("user-1","Hello Bot!")
+  AppContext.fbConnector ! FBUserTextMessage("user-1","Internal Message!")
 
   implicit val system = AppContext.system
   implicit val materializer = ActorMaterializer()
-  // needed for the future flatMap/onComplete in the end
-  //implicit val executionContext = system.dispatcher
-
-  val config = ConfigFactory.load()
 
 
+  val defaultConfig = ConfigFactory.load()
+  val config = ConfigFactory.parseURL(new URL("file:/seemedics/conf/akka/application.conf")).withFallback(defaultConfig)
 
-  val bindingFuture = Http().bindAndHandle(Resources.routes, "localhost", 10000)
+
+  val bindingFuture = Http().bindAndHandle(Resources.routes, config.getString("chat-server.host"), config.getInt("chat-server.port"))
 
 }

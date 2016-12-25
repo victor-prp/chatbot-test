@@ -31,10 +31,10 @@ class FBConnector(val router:ActorRef, val fbProxyAddress:String ) extends BaseA
       val fbBotMsg = ModelUtil.convertBotMsg(botMsg)
       val json = botTextMessage.write(fbBotMsg).toString()
       log.info("sending botMsg: {}",json)
-//      val body = HttpEntity.Strict(ContentTypes.`application/json`, data = ByteString(json))
-//      http.singleRequest( HttpRequest(uri = fbProxyAddress,
-//                          method = HttpMethods.POST,entity = body))
-//              .pipeTo(self)
+      val body = HttpEntity.Strict(ContentTypes.`application/json`, data = ByteString(json))
+      http.singleRequest( HttpRequest(uri = fbProxyAddress,
+                          method = HttpMethods.POST,entity = body))
+              .pipeTo(self)
     }
 
 
