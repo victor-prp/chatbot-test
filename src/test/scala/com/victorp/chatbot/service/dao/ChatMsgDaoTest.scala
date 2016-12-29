@@ -17,9 +17,9 @@ class ChatMsgDaoTest extends FunSuite with BeforeAndAfter {
     File(testFilePath().toString).delete()
   }
 
-//  after {
-//    File(testFilePath().toString).delete()
-//  }
+  after {
+    File(testFilePath().toString).delete()
+  }
 
 
 

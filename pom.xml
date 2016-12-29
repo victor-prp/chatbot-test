@@ -140,7 +140,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.victorp.chatbot.ChatbotApp</Main-Class>
+                                        <Main-Class>com.victorp.chatbot.app.ChatbotApp</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

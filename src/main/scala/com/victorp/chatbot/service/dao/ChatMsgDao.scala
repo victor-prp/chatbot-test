@@ -22,9 +22,13 @@ class ChatMsgDao(val fullFileName:Path) extends BaseDao[ChatMsg]{
   }
 
   override def getAllFromDB(db: JsonDB, ids:String*): Seq[ChatMsg] = {
-    val userId:String = ids.head
-    val userDataO = db.usersData.get(userId)
-    userDataO match {
+    val userId:String = ids match {
+      case head::Nil => head
+      case _ => throw new RuntimeException(s"ids must contain exactly one id representing the userId, but was ${ids.size}")
+    }
+
+    val userDataOpt = db.usersData.get(userId)
+    userDataOpt match {
       case None => List()
       case Some(userData) => userData.chatMsgs
     }
