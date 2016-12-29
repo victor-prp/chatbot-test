@@ -1,4 +1,4 @@
-package com.victorp.chatbot
+package com.victorp.chatbot.app
 
 import java.net.URL
 

@@ -4,17 +4,15 @@ import akka.actor.ActorRef
 import akka.http.javadsl.model.StatusCodes
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.stream.{ActorMaterializerSettings, ActorMaterializer}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import com.victorp.chatbot.dto.FBUserTextMessage
-import com.victorp.chatbot.model.ChatMsg
-import com.victorp.chatbot.protocol.FBProtocol
-import com.victorp.chatbot.util.ModelUtil
+import com.victorp.chatbot.dto.json.DtoJsonProtocol
+import com.victorp.chatbot.dto.{BotTextMsgDTO, UserTextMsgDTO}
 
 /**
  * @author victorp
  */
-class FBConnector(val router:ActorRef, val fbProxyAddress:String ) extends BaseActor with FBProtocol{
+class PlatformProxyConnector(val router:ActorRef, val fbProxyAddress:String ) extends BaseActor with DtoJsonProtocol{
   final implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system))
   import akka.pattern.pipe
   import context.dispatcher
@@ -22,16 +20,15 @@ class FBConnector(val router:ActorRef, val fbProxyAddress:String ) extends BaseA
   val http = Http(context.system)
 
   override def receive: Receive ={
-    case userMsg: FBUserTextMessage => {
+    case userMsg: UserTextMsgDTO => {
       log.debug("user msg received: {}", userMsg)
-      router ! ModelUtil.convertUserMsg(userMsg)
+      router ! userMsg
     }
 
-    case botMsg: ChatMsg => {
+    case botMsg: BotTextMsgDTO => {
       log.debug("bot msg received: {}", botMsg)
-      val fbBotMsg = ModelUtil.convertBotMsg(botMsg)
-      val json = botTextMessage.write(fbBotMsg).toString()
-      log.info("sending botMsg: {}",json)
+      val json = botTextMessage.write(botMsg).toString()
+      log.debug("sending botMsg: {}",json)
       val body = HttpEntity.Strict(ContentTypes.`application/json`, data = ByteString(json))
       http.singleRequest( HttpRequest(uri = s"http://$fbProxyAddress/proxy",
                           method = HttpMethods.POST,entity = body))

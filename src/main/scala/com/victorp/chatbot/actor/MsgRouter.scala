@@ -1,15 +1,14 @@
 package com.victorp.chatbot.actor
 
-import akka.pattern.ask
-import akka.actor.{Props, ActorRef}
-import com.victorp.chatbot.dto.FBUserTextMessage
+import akka.actor.{ActorRef, Props}
+import com.victorp.chatbot.dto.{UserTextMsgDTO, BotTextMsgDTO}
 import com.victorp.chatbot.model.ChatMsg
 
 
 /**
  * @author victorp
  */
-class Router extends BaseActor {
+class MsgRouter extends BaseActor {
 
   var chatbots: Map[String, ActorRef] = Map()
 
@@ -20,18 +19,18 @@ class Router extends BaseActor {
   }
 
 
-  def chatbotActor(userId: String): ActorRef = {
-    chatbots.get(userId) match {
-      case Some(cm) => cm
-      case None => createChatbot(userId)
+  def chatbotActor(platformUserId: String): ActorRef = {
+    chatbots.get(platformUserId) match {
+      case Some(chatbot) => chatbot
+      case None => createChatbot(platformUserId)
     }
   }
 
 
   override def receive: Receive = {
-    case chatMsg: ChatMsg => {
+    case chatMsg: UserTextMsgDTO => {
       log.debug(s"Router received msg: {}", chatMsg)
-      val chatbot = chatbotActor(chatMsg.targetId)
+      val chatbot = chatbotActor(chatMsg.platformUserId)
       chatbot ! chatMsg
     }
   }

@@ -76,7 +76,6 @@
             <!--<version>10.0.0</version>-->
         <!--</dependency>-->
 
-
         <!-- logging -->
 
         <dependency>
@@ -89,6 +88,14 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!--test-->
+        <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>3.0.1</version>
         </dependency>
 
     </dependencies>
