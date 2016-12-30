@@ -5,14 +5,23 @@ package com.victorp.chatbot.model
 /**
  * @author victorp
  */
-case class UserProfile(id:String,chatProfile:ChatProfile,fbProfile:Option[FacebookProfile]) extends Entity
+case class UserProfile(id:String,
+                       chatProfile:Option[ChatProfile]= None,
+                       fbProfile:Option[FacebookProfile]= None) extends Entity
 
 /**
  * Provided by facebook
  */
-case class FacebookProfile(firstName:String, lastName:String,profilePicURL:String, locale: String, timezone: Int, gender:String)
+case class FacebookProfile(facebookUserId:String,
+                           firstName:Option[String] = None,
+                           lastName:Option[String]= None,
+                           profilePicURL:Option[String]= None,
+                           locale: Option[String]= None,
+                           timezone: Option[Int]= None,
+                           gender:Option[String]= None)
 
 /**
- * Provided by the user via chat
+ * Used while chatting with a user
+ * The info is provided by the user via chat or got from some msg platform
  */
-case class ChatProfile(name:String)
+case class ChatProfile(name:Option[String])

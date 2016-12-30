@@ -28,4 +28,9 @@ trait AppConfig {
   def facebookProxyHost: String = {
     config.getString("facebook.proxy.host")
   }
+
+  def userDataFilePath: String = {
+    config.getString("local-storage.user-data.file-name")
+
+  }
 }

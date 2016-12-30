@@ -38,7 +38,7 @@ class ModelJsonProtocolTest extends FunSuite with ModelJsonProtocol {
 
 
   trait TestDB{
-    val user1 = UserData(Some(UserProfile("user-1",ChatProfile("Micha"),None)),List())
+    val user1 = UserData(Some(UserProfile("user-1",Some(ChatProfile(Some("Micha"))),None)),List())
     val dbUser1 = JsonDB(Map("user-1"-> user1))
     val jsonhUser1 = """{"usersData":{"user-1":{"userProfile":{"id":"user-1","chatProfile":{"name":"Micha"}},"chatMsgs":[]}}}"""
 

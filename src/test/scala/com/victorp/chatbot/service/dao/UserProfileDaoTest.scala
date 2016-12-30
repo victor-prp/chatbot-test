@@ -3,7 +3,7 @@ package com.victorp.chatbot.service.dao
 import java.nio.file.Paths
 
 import com.victorp.chatbot.com.victorp.chatbot.TestUtil.tempDir
-import com.victorp.chatbot.model.{ChatProfile, UserProfile}
+import com.victorp.chatbot.model.{FacebookProfile, ChatProfile, UserProfile}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 import scala.concurrent.{ExecutionContext, Await}
@@ -18,10 +18,10 @@ class UserProfileDaoTest extends FunSuite with BeforeAndAfter {
     File(testFilePath().toString).delete()
   }
 
-  after{
-    File(testFilePath().toString).delete()
-  }
-  
+//  after{
+//    File(testFilePath().toString).delete()
+//  }
+//
   test("single user profile (save and get)") {
     new UserProfileDao(testFilePath()) with TestData {
       import ExecutionContext.Implicits.global
@@ -63,8 +63,8 @@ class UserProfileDaoTest extends FunSuite with BeforeAndAfter {
   def withUserProfileDao() = new UserProfileDao(testFilePath())
 
   trait TestData{
-    val userProfile1 = UserProfile("user-1",ChatProfile("Micha"),None)
-    val userProfile2 = UserProfile("user-2",ChatProfile("Tom"),None)
+    val userProfile1 = UserProfile("user-1",Some(ChatProfile(Some("Micha"))),Some(FacebookProfile("fb-1")))
+    val userProfile2 = UserProfile("user-2",Some(ChatProfile(Some("Tom"))),None)
   }
 }
 

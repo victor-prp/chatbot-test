@@ -1,6 +1,7 @@
 package com.victorp.chatbot.actor
 
 import akka.actor.{ActorRef, Props}
+import com.victorp.chatbot.app.AppContext
 import com.victorp.chatbot.dto.{UserTextMsgDTO, BotTextMsgDTO}
 import com.victorp.chatbot.model.ChatMsg
 
@@ -11,18 +12,22 @@ import com.victorp.chatbot.model.ChatMsg
 class MsgRouter extends BaseActor {
 
   var chatbots: Map[String, ActorRef] = Map()
+  val DOT = "."
 
-  def createChatbot(userId: String): ActorRef = {
-    val cm = context.actorOf(Props(classOf[Chatbot], userId), name = s"ChatManager-$userId")
-    chatbots += (userId -> cm)
+  def createChatbot(msgPlatform:String,platformUserId: String): ActorRef = {
+    val botId = chatbotId(msgPlatform,platformUserId)
+    val cm = context.actorOf(Props(AppContext.newChatBot(msgPlatform,platformUserId)), name = s"chatbot-$botId")
+    chatbots += (botId -> cm)
     cm
   }
 
+  def chatbotId(msgPlatform:String,platformUserId: String) = msgPlatform+DOT+platformUserId
 
-  def chatbotActor(platformUserId: String): ActorRef = {
-    chatbots.get(platformUserId) match {
+
+  def chatbotActor(msgPlatform:String,platformUserId: String): ActorRef = {
+    chatbots.get(chatbotId(msgPlatform,platformUserId)) match {
       case Some(chatbot) => chatbot
-      case None => createChatbot(platformUserId)
+      case None => createChatbot(msgPlatform,platformUserId)
     }
   }
 
@@ -30,7 +35,7 @@ class MsgRouter extends BaseActor {
   override def receive: Receive = {
     case chatMsg: UserTextMsgDTO => {
       log.debug(s"Router received msg: {}", chatMsg)
-      val chatbot = chatbotActor(chatMsg.platformUserId)
+      val chatbot = chatbotActor(chatMsg.msgPlatform, chatMsg.platformUserId)
       chatbot ! chatMsg
     }
   }

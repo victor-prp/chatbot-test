@@ -14,7 +14,7 @@ trait ModelJsonProtocol extends DefaultJsonProtocol {
   /**
    * Model objects
    */
-    implicit val facebookProfile = jsonFormat6(FacebookProfile)
+    implicit val facebookProfile = jsonFormat7(FacebookProfile)
     implicit val chatProfile = jsonFormat1(ChatProfile)
     implicit val userProfile = jsonFormat3(UserProfile)
     implicit val chatMsg = jsonFormat8(ChatMsg)
