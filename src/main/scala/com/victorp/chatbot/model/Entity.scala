@@ -1,10 +1,10 @@
 package com.victorp.chatbot.model
 
 /**
- * Base class for all model entities
+ * Represents model entity that will be persistent
+ * and accessible from a store directly by id or multiple ids
  *
  * @author victorp
  */
 trait Entity{
-  val id:String
 }

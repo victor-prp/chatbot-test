@@ -1,49 +1,59 @@
 package com.victorp.chatbot.model.json
 
-import com.victorp.chatbot.model.{ChatMsg, ChatProfile, UserProfile}
+import com.victorp.chatbot.model._
+import org.junit.runner.RunWith
 import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 import spray.json._
 
 /**
  * @author victorp
  */
+@RunWith(classOf[JUnitRunner])
 class ModelJsonProtocolTest extends FunSuite with ModelJsonProtocol {
 
   test("empty DB to json") {
-      assert("""{"usersData":{}}""" === jsonDB.write(JsonDB()).toString())
+      assert("""{"usersData":[]}""" === dbJsonProtocol.write(JsonDB()).toString())
     }
 
   test("empty DB from json") {
-    assert(jsonDB.read("""{"usersData":{}}""".parseJson) === JsonDB())
+    assert(dbJsonProtocol.read("""{"usersData":[]}""".parseJson) === JsonDB())
 
   }
 
   test("single User to  json") {
     new TestDB {
-      assert(jsonhUser1 === jsonDB.write(dbUser1).toString())
+      val serialized = dbJsonProtocol.write(dbUser1).toString()
+      assert(jsonhUser1 === serialized)
     }
   }
 
   test("single User from json")  {
     new TestDB {
-      assert(jsonDB.read(jsonhUser1.parseJson) === dbUser1)
+      assert(dbJsonProtocol.read(jsonhUser1.parseJson) === dbUser1)
     }
   }
 
-  test("single User with single Msh to  json") {
+  test("single User with single Msg to  json") {
     new TestDB {
-      assert(jsonUser1Msg1 === jsonDB.write(dbUser1Msg1).toString())
+      val json = dbJsonProtocol.write(dbUser1Msg1).toString()
+      assert(jsonUser1Msg1 === json)
     }
   }
 
 
   trait TestDB{
-    val user1 = UserData(Some(UserProfile("user-1",Some(ChatProfile(Some("Micha"))),None)),List())
-    val dbUser1 = JsonDB(Map("user-1"-> user1))
-    val jsonhUser1 = """{"usersData":{"user-1":{"userProfile":{"id":"user-1","chatProfile":{"name":"Micha"}},"chatMsgs":[]}}}"""
+    val userId = "fb-1"
+    val msgPlatform = MsgPlatform.FACEBOOK
+    val user1 = UserData(UserProfile(userId,msgPlatform,UserDetails(firstName = Some("Micha"))))
+    val dbUser1 = JsonDB(List(user1))
+    val jsonhUser1 = """{"usersData":[{"userProfile":{"userId":"fb-1","msgPlatform":"facebook","userDetails":{"firstName":"Micha"}},"chatMsgs":[]}]}"""
 
-    val user1Msg1 = user1.copy(chatMsgs = List(ChatMsg("msg1",user1.userProfile.get.id,"Hello",0,"USER","FACEBOOK","fb-1",None)))
-    val dbUser1Msg1 = JsonDB(Map("user-1"-> user1Msg1))
-    val jsonUser1Msg1 = """{"usersData":{"user-1":{"userProfile":{"id":"user-1","chatProfile":{"name":"Micha"}},"chatMsgs":[{"timestamp":0,"text":"Hello","id":"msg1","sentBy":"USER","userId":"user-1","platform":"FACEBOOK"}]}}}""" 
+    val chatMsg1 = ChatMsg(userId,msgPlatform,1,"Hi Micha",0,SentBy.BOT,None)
+    val user1Msg1 = user1.copy(chatMsgs = List(chatMsg1))
+    val dbUser1Msg1 = JsonDB(List(user1Msg1))
+    val jsonUser1Msg1 = """{"usersData":[{"userProfile":{"userId":"fb-1","msgPlatform":"facebook","userDetails":{"firstName":"Micha"}},"chatMsgs":[{"timestamp":0,"text":"Hi Micha","sentBy":"bot","msgPlatform":"facebook","userId":"fb-1","sequenceNumber":1}]}]}"""
+
+
   }
 }

@@ -11,29 +11,47 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * @author victorp
  */
-class UserProfileDao(val fullFileName:Path) extends BaseDao[UserProfile] {
+class UserProfileDao(val fullFileName:Path) extends BaseDao{
 
-  def saveNewToDB(userProfile: UserProfile,db: JsonDB):JsonDB = {
-    JsonDB(db.usersData + (userProfile.id -> UserData(Some(userProfile))))
+  def extractUserProfile(userId: String, msgPlatform: String)(db:JsonDB):Option[UserProfile] = {
+    extractUser(userId, msgPlatform, db).map(_.userProfile)
+  }
+
+  def get(userId:String, msgPlatform:String):Future[Option[UserProfile]] = {
+    getFromDB{
+      extractUserProfile(userId,msgPlatform)
+    }
   }
 
 
-  def getAllFromDB(db: JsonDB,ids:String*): Seq[UserProfile] = {
-    val relevantUserProfiles =
-    for {
-      userData <- db.usersData.values
-      userProfile <- userData.userProfile
-    }yield userProfile
+  def updateUserProfile(newUserProfile: UserProfile)(db:JsonDB):JsonDB = {
+    val userDataOpt:Option[UserData] = extractUser(newUserProfile.userId,newUserProfile.msgPlatform,db)
 
-    relevantUserProfiles.toList
+    val updatedUserData:UserData =
+      userDataOpt match {
+        case None => UserData(newUserProfile)
+        case Some(userData) => userData.copy(userProfile = newUserProfile)
+      }
+
+    val updatedUsers = updateUser(db.usersData, updatedUserData)
+    JsonDB(updatedUsers)
   }
 
+  def save(userProfile:UserProfile):Future[Unit] = {
+    updateDB{
+      updateUserProfile(userProfile)
+    }
+  }
 
-  override def getById(id: Long): Future[Option[UserProfile]] = ???
+  def extractAll(db:JsonDB):Seq[UserProfile] = {
+    db.usersData.map(_.userProfile)
+  }
 
-  override def updateById(id: Long, row: UserProfile): Future[Int] = ???
-
-  override def deleteById(id: Long): Future[Int] = ???
+  def getAll():Future[Seq[UserProfile]] = {
+    getFromDB{
+      extractAll
+    }
+  }
 
 
 }

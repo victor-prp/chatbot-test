@@ -14,10 +14,10 @@ trait ModelJsonProtocol extends DefaultJsonProtocol {
   /**
    * Model objects
    */
-    implicit val facebookProfile = jsonFormat7(FacebookProfile)
-    implicit val chatProfile = jsonFormat1(ChatProfile)
-    implicit val userProfile = jsonFormat3(UserProfile)
-    implicit val chatMsg = jsonFormat8(ChatMsg)
+
+  implicit val userDetailsJsonProtocol = jsonFormat6(UserDetails)
+  implicit val chatMsgJsonProtocol = jsonFormat7(ChatMsg)
+  implicit val userProfileJsonProtocol = jsonFormat3(UserProfile)
 
 
 
@@ -30,20 +30,20 @@ trait ModelJsonProtocol extends DefaultJsonProtocol {
   /**
    * It holds the whole DB in order to represent it as a single json
    */
-  implicit val jsonUserData = jsonFormat2(UserData)
+  implicit val userDataJsonProtocol = jsonFormat2(UserData)
 
   /**
    * It holds the whole DB in order to represent it as a single json
    */
-  implicit val jsonDB = jsonFormat1(JsonDB)
+  implicit val dbJsonProtocol = jsonFormat1(JsonDB)
 
 }
 
-case class UserData(userProfile:Option[UserProfile] = None,chatMsgs:List[ChatMsg] = List())
+case class UserData(userProfile:UserProfile,chatMsgs:List[ChatMsg] = List())
 /**
  * Represents json that holds the whole DB
  */
-case class JsonDB(usersData:Map[String,UserData] = Map())
+case class JsonDB(usersData:List[UserData] = List())
 
 
 

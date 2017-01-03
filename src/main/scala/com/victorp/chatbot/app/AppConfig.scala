@@ -31,6 +31,5 @@ trait AppConfig {
 
   def userDataFilePath: String = {
     config.getString("local-storage.user-data.file-name")
-
   }
 }

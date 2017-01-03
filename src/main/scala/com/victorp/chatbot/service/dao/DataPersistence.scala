@@ -1,10 +1,8 @@
 package com.victorp.chatbot.service.dao
 
-import java.io.{PrintWriter, File}
+import java.io.File
+import java.io.{File, PrintWriter}
 import java.nio.file.Path
-import java.util.concurrent.locks.{ReentrantReadWriteLock, ReadWriteLock}
-
-import com.victorp.chatbot.model.json._
 
 import scala.io.Source
 
@@ -32,7 +30,11 @@ trait DataPersistence {
 
   }
 
-  def readFromFile() : String = {
-    Source.fromFile(file.getPath).getLines().mkString
+  def readFromFile() : Option[String] = {
+    if (new File(file.getPath) exists) {
+      Some(Source.fromFile(file.getPath).getLines().mkString)
+    } else {
+      None
+    }
   }
 }

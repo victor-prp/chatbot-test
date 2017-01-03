@@ -2,44 +2,59 @@ package com.victorp.chatbot.service.dao
 
 import java.nio.file.Path
 
-import com.victorp.chatbot.model.ChatMsg
-import com.victorp.chatbot.model.json.{UserData, JsonDB}
+import com.victorp.chatbot.model.json.{JsonDB, UserData}
+import com.victorp.chatbot.model.{ChatMsg, UserProfile}
 
 import scala.concurrent.Future
-
 /**
  * @author victorp
  */
-class ChatMsgDao(val fullFileName:Path) extends BaseDao[ChatMsg]{
 
-  override def saveNewToDB(chatMsg: ChatMsg, db: JsonDB): JsonDB = {
-    val updatedUseData:UserData =
-     db.usersData.get(chatMsg.userId) match  {
-      case None => UserData(chatMsgs = List(chatMsg))
-      case Some(userData) => UserData(chatMsgs = chatMsg::userData.chatMsgs)
-    }
-    JsonDB(db.usersData + (chatMsg.userId -> updatedUseData))
-  }
 
-  override def getAllFromDB(db: JsonDB, ids:String*): Seq[ChatMsg] = {
-    val userId:String = ids match {
-      case head::Nil => head
-      case _ => throw new RuntimeException(s"ids must contain exactly one id representing the userId, but was ${ids.size}")
-    }
+class ChatMsgDao(val fullFileName:Path) extends BaseDao{
 
-    val userDataOpt = db.usersData.get(userId)
+
+  private def extractMsgsFromDB(userId:String,msgPlatform:String,db:JsonDB):Seq[ChatMsg] = {
+    val userDataOpt:Option[UserData] = extractUser(userId,msgPlatform,db)
+
     userDataOpt match {
-      case None => List()
-      case Some(userData) => userData.chatMsgs
-    }
+     case None => List()
+     case Some(userDetails) => userDetails.chatMsgs
+   }
+
+  }
+
+  def getAll(userId:String,msgPlatform:String):Future[Seq[ChatMsg]] = {
+    getFromDB(extractMsgsFromDB(userId,msgPlatform,_))
   }
 
 
 
-  override def updateById(id: Long, entity: ChatMsg): Future[Int] = ???
+  private def addMsg(msg: ChatMsg)( db: JsonDB): JsonDB = {
+    val userDataOpt:Option[UserData] = extractUser(msg.userId,msg.msgPlatform,db)
 
-  override def deleteById(id: Long): Future[Int] = ???
+    val updatedUserData:UserData =
+      userDataOpt match {
+      case None => createNewUserWithMsg(msg)
+      case Some(userData) => userData.copy(chatMsgs= msg::userData.chatMsgs)
+    }
 
-  override def getById(id: Long): Future[Option[ChatMsg]] = ???
+    val updatedUsers = updateUser(db.usersData, updatedUserData)
+    JsonDB(updatedUsers)
+  }
+
+
+
+  private def createNewUserWithMsg(msg: ChatMsg): UserData = {
+    UserData(UserProfile(userId = msg.userId, msgPlatform = msg.msgPlatform), List(msg))
+  }
+
+  /**
+   * Saves new message
+   */
+  def save(msg:ChatMsg):Future[Unit] = {
+    updateDB(addMsg(msg))
+  }
+
 
 }

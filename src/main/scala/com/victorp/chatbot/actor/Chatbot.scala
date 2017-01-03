@@ -16,7 +16,7 @@ import ExecutionContext.Implicits.global
  */
 class Chatbot(val msgPlatform:String,val platformUserId:String,charMsgDao:ChatMsgDao, userProfileDao:UserProfileDao) extends BaseActor{
 
-  var userProfile:Option[UserProfile] = None
+  var userProfileOpt:Option[UserProfile] = None
 
   findUserProfile()
 
@@ -47,18 +47,11 @@ class Chatbot(val msgPlatform:String,val platformUserId:String,charMsgDao:ChatMs
     }
   }
 
-  def facebookId(userProfile:UserProfile):Boolean = extractFacebookId(userProfile) match {
-    case Some(someFacebookId) if someFacebookId == platformUserId => true
-    case _ => false
+  def facebookId(userProfile:UserProfile):Boolean = true
 
-  }
 
-  def extractFacebookId(userProfile:UserProfile):Option[String] =
-    userProfile.fbProfile match {
-      case None => None
-      case Some(fbProfile) => Some(fbProfile.facebookUserId)
-    }
-
+  def extractFacebookId(userProfile:UserProfile):String =
+    userProfile.userId
 
   def echo(userMsg: UserTextMsgDTO): BotTextMsgDTO = {
     val name:String = chatName.getOrElse("")
@@ -68,10 +61,10 @@ class Chatbot(val msgPlatform:String,val platformUserId:String,charMsgDao:ChatMs
 
   def chatName:Option[String] =  {
     for {
-      userP <- userProfile
-      chatP <- userP.chatProfile
-      theName <- chatP.name
-    }yield theName
+      userProfile <- userProfileOpt
+      firstName <- userProfile.userDetails.firstName
+    }yield firstName
+    
   }
 
   override def receive: Receive = {
@@ -84,13 +77,12 @@ class Chatbot(val msgPlatform:String,val platformUserId:String,charMsgDao:ChatMs
 
     case userProfileFound:UserProfileFound => {
       log.debug("User profile found : {}",userProfileFound.userProfile)
-      userProfile = Some(userProfileFound.userProfile)
+      userProfileOpt = Some(userProfileFound.userProfile)
     }
 
     case userProfileNotFound:UserProfileNotFound => {
       log.debug("User profile not found for facebook user: {}, going to create new profile",platformUserId)
-      val fbProfile = FacebookProfile(facebookUserId = platformUserId)
-      userProfile = Some(UserProfile(IdUtil.nextUserId(),None,Some(fbProfile)))
+      userProfileOpt = Some(UserProfile(platformUserId,msgPlatform))
     }
   }
 
