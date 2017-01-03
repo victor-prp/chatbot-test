@@ -25,29 +25,29 @@ class Chatbot(val msgPlatform:String,val platformUserId:String,charMsgDao:ChatMs
    * and send corresponding msg to self (UserProfileFound or UserProfileNotFound)
    */
   def findUserProfile() = {
-    val userProfiles:Future[Seq[UserProfile]] =
+    val userProfileFuture:Future[Option[UserProfile]] =
     for {
-      userProfiles: Seq[UserProfile] <- userProfileDao.getAll()
-    } yield userProfiles.filter(facebookId)
+      userProfile <- userProfileDao.get(platformUserId,msgPlatform)
+    } yield userProfile
 
-    userProfiles onSuccess  {
-      case head::Nil => {
+    userProfileFuture onSuccess  {
+      case Some(userProfile) => {
         log.debug("User profile found for facebook user: {}",platformUserId)
-        self ! UserProfileFound(head)
+        self ! UserProfileFound(userProfile)
       }
 
-      case Nil => {
+      case None => {
         log.debug("User profile not found for facebook user: {}",platformUserId)
         self ! UserProfileNotFound()
       }
+    }
 
-      case _ => {
-        log.error("Logical ERROR: Multiple profiles found for facebook user: {}",platformUserId)
-      }
+    userProfileFuture onFailure {
+      case runtime:Exception => log.error(runtime,s"Failed to find user profile userId: $platformUserId, msgPlatform: $msgPlatform")
     }
   }
 
-  def facebookId(userProfile:UserProfile):Boolean = true
+  def facebookUser(userProfile:UserProfile):Boolean = true
 
 
   def extractFacebookId(userProfile:UserProfile):String =
