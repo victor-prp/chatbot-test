@@ -3,29 +3,40 @@ package com.victorp.chatbot.app
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
-import com.victorp.chatbot.actor.{Chatbot, MsgRouter, PlatformProxyConnector}
+import com.victorp.chatbot.actor.{FacebookChatbot, MsgRouter, PlatformProxyConnector}
 import com.victorp.chatbot.service.dao.{UserProfileDao, ChatMsgDao}
+import com.victorp.chatbot.service.facebook.FacebookGraphAPI
 
 /**
+ * Manual DI
  * @author victorp
  */
 object AppContext extends AppConfig{
 
-  // Create an Akka system
+  /**
+   * Actor system
+   */
   val system = ActorSystem("ChatbotSystem")
 
-  // create actors
+  /**
+   * Actors singletons
+   */
   val router = system.actorOf(Props[MsgRouter])
-
   val fbConnector = system.actorOf(Props(new PlatformProxyConnector(router,s"$facebookProxyHost:$facebookProxyPort")))
 
-  Paths.get(userDataFilePath)
+  /**
+   * Actors prototypes
+   */
+  def newChatBot(msgPlatform:String,platformUserId:String):FacebookChatbot = {
+    new FacebookChatbot(msgPlatform,platformUserId,chatMsgDao,userProfileDao,facebookGraphAPI)
+  }
 
+  /**
+   * Services (singletons)
+   */
   val chatMsgDao = new ChatMsgDao(Paths.get(userDataFilePath))
   val userProfileDao = new UserProfileDao(Paths.get(userDataFilePath))
+  val facebookGraphAPI = new FacebookGraphAPI(system,facebookAccessToken)
 
-  def newChatBot(msgPlatform:String,platformUserId:String):Chatbot = {
-    new Chatbot(msgPlatform,platformUserId,chatMsgDao,userProfileDao)
-  }
 
 }

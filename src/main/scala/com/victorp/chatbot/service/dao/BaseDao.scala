@@ -1,14 +1,9 @@
 package com.victorp.chatbot.service.dao
 
-import java.util
-
-import com.victorp.chatbot.model.{UserProfile, Entity}
-import com.victorp.chatbot.model.json.{UserData, JsonDB, ModelJsonProtocol}
-
-import scala.collection.JavaConverters._
-import scala.concurrent.{Future, ExecutionContext}
-
+import com.victorp.chatbot.model.json.{JsonDB, ModelJsonProtocol, UserData}
 import spray.json._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * @author victorp

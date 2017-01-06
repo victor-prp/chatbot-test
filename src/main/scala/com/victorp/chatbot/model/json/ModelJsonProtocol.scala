@@ -1,8 +1,5 @@
 package com.victorp.chatbot.model.json
 
-import java.net.URL
-import java.time.ZoneId
-
 import com.victorp.chatbot.model._
 import spray.json.DefaultJsonProtocol
 
