@@ -1,0 +1,123 @@
+{
+  "dialogs": [
+    {
+      "name": "stroke",
+      "hints": [
+        "Hi bot"
+      ],
+      "msgs": [
+        {
+          "seq": 1,
+          "text": "Hi bot",
+          "sender": "user"
+        },
+        {
+          "seq": 2,
+          "text": "Hi. How can I help you?",
+          "sender": "bot"
+        },
+        {
+          "seq": 3,
+          "text": "I think I have a stroke",
+          "sender": "user"
+        },
+        {
+          "seq": 4,
+          "text": "Sounds very serious! What makes you think you have a heart attack?",
+          "sender": "bot"
+        },
+        {
+          "seq": 5,
+          "text": "I feel pressure in my chest and unusual pain in my left hand",
+          "sender": "user"
+        },
+        {
+          "seq": 6,
+          "text": "Please call immediately 911, it sounds like a real risk!!!! I can connect you to an emergency service right now. Make the connection?",
+          "sender": "bot"
+        },
+        {
+          "seq": 7,
+          "text": "yes",
+          "sender": "user"
+        },
+        {
+          "seq": 8,
+          "text": "OK. Connecting. Please wait...",
+          "sender": "bot"
+        }
+
+      ]
+    },
+    {
+      "name": "brain-cancer-fear",
+      "hints": [
+        "Hi bot"
+      ],
+      "msgs": [
+        {
+          "seq": 1,
+          "text": "Good evening",
+          "sender": "user"
+        },
+        {
+          "seq": 2,
+          "text": "Good evening Mr Victor",
+          "sender": "bot"
+        },
+        {
+          "seq": 3,
+          "text": "I have strange headaches lately, can it be a brain cancer?",
+          "sender": "user"
+        },
+        {
+          "seq": 4,
+          "text": "There is a very little chance that headaches are caused by a cancer. Mostly it is a result of stress, insomnia or another common condition. I will ask you a few additional questions in order to understand better your symptoms and try to help. OK?",
+          "sender": "bot"
+        },
+        {
+          "seq": 5,
+          "text": "Yea, sure",
+          "sender": "user"
+        },
+        {
+          "seq": 6,
+          "text": "Do you feel any additional unusual symptoms in addition to headaches?",
+          "sender": "bot"
+        },
+        {
+          "seq": 7,
+          "text": "Yes. I feel tired and nervous",
+          "sender": "user"
+        },
+        {
+          "seq": 8,
+          "text": "How about your sleep habits? How much do you sleep per night (in average)?",
+          "sender": "bot"
+        },
+        {
+          "seq": 9,
+          "text": "Five hours, may be five and a half",
+          "sender": "user"
+        },
+        {
+          "seq": 10,
+          "text": "Did you experiences any major change lately as new job, new baby born etc.?",
+          "sender": "bot"
+        },
+        {
+          "seq":11,
+          "text": "Actually yes. A few weeks ago I got a new position and now I am major manager",
+          "sender": "user"
+        },
+        {
+          "seq": 12,
+          "text": "Ohh, congratulations Victor. I hope you will enjoy from your new role. Anyway it looks you are a little bit under stress which can cause headaches and nervousness",
+          "sender": "bot"
+        }
+      ]
+    }
+
+
+  ]
+}

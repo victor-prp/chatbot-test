@@ -4,7 +4,10 @@ import com.victorp.chatbot.app.AppContext
 import com.victorp.chatbot.dto.{BotTextMsgDTO, UserTextMsgDTO}
 import com.victorp.chatbot.model._
 import com.victorp.chatbot.service.dao.{ChatMsgDao, UserProfileDao}
+import com.victorp.chatbot.service.engine.{BotEngine, ChatState}
 import com.victorp.chatbot.service.facebook.{FacebookGraphAPI, FacebookProfile}
+import com.victorp.chatbot.transform.TransformChatMsg
+import com.victorp.chatbot.transform.TransformChatMsg.transformWithSeq
 import com.victorp.chatbot.util.TimeUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,11 +17,13 @@ import scala.concurrent.Future
  */
 class FacebookChatbot(val msgPlatform:String,
                       val platformUserId:String,
-                      charMsgDao:ChatMsgDao, 
-                      userProfileDao:UserProfileDao,
-                      facebookGraphAPI:FacebookGraphAPI) extends BaseActor{
+                      val charMsgDao:ChatMsgDao,
+                      val userProfileDao:UserProfileDao,
+                      val facebookGraphAPI:FacebookGraphAPI,
+                      val botEngine:BotEngine) extends BaseActor{
 
-  var userProfileOpt:Option[UserProfile] = None
+
+  var chatState: ChatState = ChatState(None,List())
 
   findUserProfile()
 
@@ -73,7 +78,7 @@ class FacebookChatbot(val msgPlatform:String,
 
   def chatName:Option[String] =  {
     for {
-      userProfile <- userProfileOpt
+      userProfile <- chatState.userProfileOpt
       firstName <- userProfile.userDetails.firstName
     }yield firstName
     
@@ -90,29 +95,43 @@ class FacebookChatbot(val msgPlatform:String,
   }
 
   override def receive: Receive = {
-    case chatMsg: UserTextMsgDTO => {
-      log.debug(s"ChatManager received msg: {}", chatMsg)
+    case userMsgDto: UserTextMsgDTO => {
+      log.debug(s"Bot received msg: {}", userMsgDto)
 
-      val botMsg = echo(chatMsg)
-      AppContext.fbConnector ! botMsg //TODO patch: use pub/sub instead of direct messaging
+      //val botMsg = echo(chatMsg)
+      val transform = transformWithSeq(chatState.lastSeq+1)_
+      val userMsg = transform(userMsgDto)
+
+      val (newState,botMsgOpt) = botEngine.nextMsg(chatState,userMsg)
+
+      chatState = newState
+
+
+      //log.debug(s"Bot sending msg: {}", botMsgDto)
+
+      for{
+        botMsg <- botMsgOpt
+        botMsgDto = TransformChatMsg.toBotMsgDto(botMsg)
+      }yield AppContext.fbConnector ! botMsgDto //TODO patch: use pub/sub instead of direct messaging
+
     }
 
     case userProfileFound:UserProfileFound => {
       log.debug("User profile found : {}",userProfileFound.userProfile)
-      userProfileOpt = Some(userProfileFound.userProfile)
+      chatState = chatState.copy(Some(userProfileFound.userProfile))
       askForFacebookProfile()
     }
 
     case userProfileNotFound:UserProfileNotFound => {
       log.debug("User profile not found for facebook user: {}, going to create new profile",platformUserId)
-      userProfileOpt = Some(UserProfile(platformUserId,msgPlatform))
+      chatState = chatState.copy(Some(UserProfile(platformUserId,msgPlatform)))
       askForFacebookProfile()
     }
 
     case facebookProfileReceived:FacebookProfileReceived => {
       log.debug("FacebookProfile received from facebook system: {}, going to merge the data to userProfile",facebookProfileReceived.facebookProfile)
-      userProfileOpt match {
-        case Some(userProfile) => userProfileOpt = Some(userProfile.copy(userDetails = toUserDetails(facebookProfileReceived.facebookProfile)))
+      chatState.userProfileOpt match {
+        case Some(userProfile) => chatState = chatState.copy(Some(userProfile.copy(userDetails = toUserDetails(facebookProfileReceived.facebookProfile))))
         case None => log.error("Incorrect state. It was expected to have userProfile at this stage (FacebookProfileReceived)")
       }
     }

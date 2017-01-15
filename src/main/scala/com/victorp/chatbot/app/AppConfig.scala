@@ -36,4 +36,9 @@ trait AppConfig {
   def facebookAccessToken: String = {
     config.getString("facebook.accessToken")
   }
+
+  def chatEnginePredefFilePath: String = {
+    config.getString("chat-engine.predef.file-name")
+  }
+
 }

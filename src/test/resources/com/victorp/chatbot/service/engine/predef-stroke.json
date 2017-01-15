@@ -1,0 +1,33 @@
+{
+  "dialogs": [
+    {
+      "name": "stroke",
+      "hints": [
+        "Hi bot"
+      ],
+      "msgs": [
+        {
+          "seq": 1,
+          "text": "Hi bot",
+          "sender": "user"
+        },
+        {
+          "seq": 2,
+          "text": "Hi. How can I help you?",
+          "sender": "bot"
+        },
+        {
+          "seq": 3,
+          "text": "I think I have a stroke",
+          "sender": "user"
+        },
+        {
+          "seq": 4,
+          "text": "Please call immediately 911",
+          "sender": "bot"
+        }
+
+      ]
+    }
+  ]
+}

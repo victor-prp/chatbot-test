@@ -5,6 +5,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import com.victorp.chatbot.actor.{FacebookChatbot, MsgRouter, PlatformProxyConnector}
 import com.victorp.chatbot.service.dao.{UserProfileDao, ChatMsgDao}
+import com.victorp.chatbot.service.engine.BotEngine
 import com.victorp.chatbot.service.facebook.FacebookGraphAPI
 
 /**
@@ -28,7 +29,7 @@ object AppContext extends AppConfig{
    * Actors prototypes
    */
   def newChatBot(msgPlatform:String,platformUserId:String):FacebookChatbot = {
-    new FacebookChatbot(msgPlatform,platformUserId,chatMsgDao,userProfileDao,facebookGraphAPI)
+    new FacebookChatbot(msgPlatform,platformUserId,chatMsgDao,userProfileDao,facebookGraphAPI,botEngine)
   }
 
   /**
@@ -37,6 +38,7 @@ object AppContext extends AppConfig{
   val chatMsgDao = new ChatMsgDao(Paths.get(userDataFilePath))
   val userProfileDao = new UserProfileDao(Paths.get(userDataFilePath))
   val facebookGraphAPI = new FacebookGraphAPI(system,facebookAccessToken)
+  val botEngine = BotEngine(chatEnginePredefFilePath)
 
 
 }
